@@ -15,8 +15,6 @@ Item {
     property int iconBaseSize: 32
     property string inputCodeCombined
 
-    property var exposedMacroItemModel: macroItemModel
-
     signal homeButtonClicked
 
     MultiEffect {
@@ -281,12 +279,27 @@ Item {
                         required property int index
                         required macroName
                         required macroCode
-                        containerWidth: macroListContainer.width/1.5
 
+                        containerWidth: macroListContainer.width/1.5
                         // macroItemModel.get(index).macroCode
 
                         onDeleteButtonClicked: {
+                            if(macroItemModel.get(index).state === Qt.Checked) {
+                                macroItemModelCopy.remove(index, 1);
+                            }
+
                             macroItemModel.remove(index, 1);
+                        }
+
+                        onCheckStateChanged: (state) => {
+                            if(state === Qt.Checked) {
+                                macroItemModelCopy.append({macroName: macroName, macroCode: macroCode});
+                                console.log(macroItemModelCopy);
+                            }
+                            if(state === Qt.Unchecked) {
+                                macroItemModelCopy.remove(index, 1);
+                                console.log(macroItemModelCopy);
+                            }
                         }
                     }
                 }

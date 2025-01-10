@@ -139,11 +139,11 @@ void AppController::onKbMacrosWindowLoaded() {
             QString objectName = item->objectName();
             qDebug() << "Loaded item objectName:" << objectName;
 
-            QObject* macroItemModel = item->findChild<QObject*>("macroItemModel");
-            if (macroItemModel) {
-                qDebug() << "macroItemModel found";
+            QObject* macroItemModelCopy = item->findChild<QObject*>("macroItemModelCopy");
+            if (macroItemModelCopy) {
+                qDebug() << "macroItemModelCopy found";
 
-                QAbstractListModel* listModel = qobject_cast<QAbstractListModel*>(macroItemModel);
+                QAbstractListModel* listModel = qobject_cast<QAbstractListModel*>(macroItemModelCopy);
                 if (listModel) {
                     // Connect signals to detect changes in the ListModel
                     connect(listModel, &QAbstractListModel::rowsInserted, this, [this, listModel]() {
@@ -165,10 +165,10 @@ void AppController::onKbMacrosWindowLoaded() {
                     qDebug() << "Initial ListModel elements:";
                     updateMacros(listModel);
                 } else {
-                    qDebug() << "Unable to cast macroItemModel to QAbstractListModel*";
+                    qDebug() << "Unable to cast macroItemModelCopy to QAbstractListModel*";
                 }
             } else {
-                qDebug() << "macroItemModel not found";
+                qDebug() << "macroItemModelCopy not found";
             }
         } else {
             qDebug() << "No item loaded";

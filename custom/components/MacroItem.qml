@@ -7,11 +7,13 @@ Rectangle {
     required property real containerWidth
     required property string macroCode
     required property string macroName
+    property alias state: checkBox.checkState
     //required property real containerHeight
 
     Material.theme: Material.Dark
 
     signal deleteButtonClicked()
+    signal checkStateChanged(int state)
 
     border.color: "#ecf0f1"
     border.width: 2
@@ -27,6 +29,17 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         activeFocusOnTab: false
+
+        nextCheckState: function() {
+            if (checkState === Qt.Checked) {
+                macroItem.checkStateChanged(Qt.Unchecked);
+                return Qt.Unchecked;
+            }
+            else {
+                macroItem.checkStateChanged(Qt.Checked);
+                return Qt.Checked;
+            }
+        }
     }
 
     Label {
