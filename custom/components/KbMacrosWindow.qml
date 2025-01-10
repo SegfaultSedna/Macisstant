@@ -210,6 +210,7 @@ Item {
                     if (firstItem) {
                         firstItem.clearKeyInputText()
                     }
+
                     mainKeyInput.clearInputField()
                     macroNameInput.clearInputField()
                 }
@@ -227,6 +228,32 @@ Item {
         border.color: "#ecf0f1"
         border.width: 2
         radius: 4
+
+        signal deleteRequested(int index)
+
+
+        onDeleteRequested:(index) => {
+            if(macroItemModel.get(index).state === Qt.Checked) {
+                macroItemModelCopy.remove(index, 1);
+            }
+
+            macroItemModel.remove(index, 1);
+        }
+
+        PopupWindow {
+            id: deletePopup
+            popupText: "Are you sure?"
+            popupTextSize: 32
+            popupTextColor: "#e74c3c"
+            property int indexToDelete
+            z: 2
+
+            onOkButtonClicked: {
+                visible = false
+                macroListContainer.deleteRequested(deletePopup.indexToDelete)
+            }
+            onCancelButtonClicked: visible = false
+        }
 
         ScrollView {
             id: listMacroScroll
@@ -273,6 +300,7 @@ Item {
                 anchors.topMargin: 54
 
                 Repeater {
+                    id: macrosRepeater
                     model: macroItemModel
 
                     delegate: MacroItem {
@@ -283,12 +311,10 @@ Item {
                         containerWidth: macroListContainer.width/1.5
                         // macroItemModel.get(index).macroCode
 
-                        onDeleteButtonClicked: {
-                            if(macroItemModel.get(index).state === Qt.Checked) {
-                                macroItemModelCopy.remove(index, 1);
-                            }
 
-                            macroItemModel.remove(index, 1);
+                        onDeleteButtonClicked: {
+                            deletePopup.indexToDelete = index
+                            deletePopup.visible = true
                         }
 
                         onCheckStateChanged: (state) => {

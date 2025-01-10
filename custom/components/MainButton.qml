@@ -5,18 +5,19 @@ Rectangle {
     id: mainButton
     property string buttonText: ""
     property string buttonColor: ""
-    property bool isFadeInUpFinished: false  // Flag to check if fadeInUp is finished
+    property bool isFadeInUpFinished: hasAppearAnimation ? false : true  // Flag to check if fadeInUp is finished
     property real buttonFontSize: 14
     property int buttonWidth: 140
     property int buttonHeight: 40
-    anchors.centerIn: parent
+    property bool hasAppearAnimation: true
+    //anchors.centerIn: parent
     width: buttonWidth
     height: buttonHeight
     border.color: buttonColor
     border.width: 2
     color: "transparent"
     radius: 1
-    opacity: 0
+    opacity: hasAppearAnimation ? 0 : 1
 
     signal clicked
 

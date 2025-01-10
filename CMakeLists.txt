@@ -6,11 +6,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick Widgets)
 
+
 qt_standard_project_setup(REQUIRES 6.5)
 
+
+set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/custom/resources.rc")
 qt_add_executable(appMacisstantQML_cmake WIN32
     main.cpp
     AppController.cpp
+    ${app_icon_resource_windows}
 )
 
 qt_add_qml_module(appMacisstantQML_cmake
@@ -26,20 +30,17 @@ qt_add_qml_module(appMacisstantQML_cmake
         custom/components/NumberTextInput.qml
         custom/components/KbMacrosWindow.qml
         custom/components/SimpleTextInput.qml
+        custom/components/PopupWindow.qml
     RESOURCES
         custom/images/arrow-down.svg
-        custom/images/arrow-left.svg
-        custom/images/arrow-right.svg
         custom/images/bg.jpg
         custom/images/close-line.svg
         custom/images/edit-fill.svg
         custom/images/home.svg
-        custom/images/plus-circle.svg
-        custom/images/plus-square.svg
         custom/images/save.svg
         custom/images/settings.svg
         custom/images/square-check-big.svg
-        custom/images/test.svg
+        custom/images/appicon.ico
     SOURCES
         AppController.h
 )

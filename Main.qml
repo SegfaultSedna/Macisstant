@@ -14,6 +14,7 @@ Window {
     title: qsTr("Macisstant v1.0")
     Material.theme: Material.Dark
 
+
     minimumWidth: 600
     minimumHeight: 400
     maximumWidth: 1200
@@ -123,7 +124,11 @@ Window {
             property int currentIndex: 0
             signal typingFinished
 
-            onTypingFinished: kbMacrosButton.buttonFadeInUp();
+            onTypingFinished: {
+                if (kbMacrosButton.hasAppearAnimation)
+                    kbMacrosButton.buttonFadeInUp();
+            }
+
 
             Component.onCompleted: {
                 typingTimer.start();
@@ -151,7 +156,7 @@ Window {
             id: kbMacrosButton
             buttonText: "Keyboard macros"
             buttonColor: "#ecf0f1"
-
+            anchors.centerIn: parent
             onClicked: {
                 mainWindowFadeOut.start();
                 kbMacrosWindowLoader.visible = true;

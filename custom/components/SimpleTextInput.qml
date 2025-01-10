@@ -17,6 +17,7 @@ FocusScope {
 
     function clearInputField() {
         textInput.text = "";
+        textInputValue = "";
     }
     Rectangle {
         id: rect
