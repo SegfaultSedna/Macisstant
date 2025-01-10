@@ -258,6 +258,14 @@ Item {
             }
 
 
+            ListModel {
+                id: macroItemModelCopy
+                objectName: "macroItemModelCopy"
+                //ListElement { macroName: "Unnamed Macro" }
+            }
+
+
+
             Column {
                 id: macroItemColumn
                 //anchors { left: yourMacrosText.left; top: yourMacrosText.bottom; leftMargin: 12; topMargin: 12 }

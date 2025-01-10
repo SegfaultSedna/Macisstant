@@ -1,30 +1,35 @@
+#include <QApplication>
+#include <QWindow>
+#include <QTimer>
+#include <QMainWindow>
 #include "AppController.h"
 #include <QDebug>
 #include <QQmlProperty>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QRegularExpression>
-#include <regex>
 #include <thread>
 #include <chrono>
 #include <windows.h>
 
-std::unordered_map<QString, QString> AppController::triggerKeyToMacroCode;
+std::unordered_map<QString, QString> AppController::macroList;
 HHOOK AppController::keyboardHook = nullptr;
-AppController *AppController::instance = nullptr; // Define the instance pointer
+AppController* AppController::instance = nullptr;
+HWND AppController::appWindowHandle = nullptr;
+bool AppController::isMacroExecuting = false; // Initialize the flag
 
 AppController::AppController(QQmlApplicationEngine *engine, QObject *parent)
     : QObject(parent), engine(engine) {
-    // Install the event filter on the application instance
-    qApp->installEventFilter(this);
-
     // Set up the global keyboard hook
     keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, nullptr, 0);
     if (!keyboardHook) {
         qDebug() << "Failed to install hook!";
     }
 
-    instance = this; // Set the instance pointer
+    instance = this;
+    // Connect application state changed signal
+    // Initialize the window handle once
+    QTimer::singleShot(0, this, &AppController::initializeWindowHandle);
 }
 
 AppController::~AppController() {
@@ -36,6 +41,9 @@ AppController::~AppController() {
 void AppController::EnableHook() {
     if (!keyboardHook) {
         keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, nullptr, 0);
+        qDebug() << "Hook enabled";
+    } else {
+        qDebug() << "Hook already enabled";
     }
 }
 
@@ -43,6 +51,21 @@ void AppController::DisableHook() {
     if (keyboardHook) {
         UnhookWindowsHookEx(keyboardHook);
         keyboardHook = nullptr;
+        qDebug() << "Hook disabled";
+    } else {
+        qDebug() << "Hook already disabled";
+    }
+}
+
+void AppController::initializeWindowHandle() {
+    // Retrieve the window handle for the application's main window
+    const QList<QWindow *> topLevelWindows = qApp->topLevelWindows();
+    if (!topLevelWindows.isEmpty()) {
+        QWindow *window = topLevelWindows.first();
+        if (window) {
+            appWindowHandle = reinterpret_cast<HWND>(window->winId());
+            qDebug() << "App window handle initialized:" << appWindowHandle;
+        }
     }
 }
 
@@ -51,14 +74,24 @@ LRESULT CALLBACK AppController::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
         KBDLLHOOKSTRUCT *pKeyboard = reinterpret_cast<KBDLLHOOKSTRUCT *>(lParam);
         QString key = QKeySequence(pKeyboard->vkCode | GetKeyState(VK_CONTROL) & 0x8000 | GetKeyState(VK_SHIFT) & 0x8000 | GetKeyState(VK_MENU) & 0x8000).toString();
 
+        // Check if the foreground window is the application's window
+        HWND foregroundWindow = GetForegroundWindow();
+        if (foregroundWindow == appWindowHandle || isMacroExecuting) {
+            //qDebug() << "Ignoring key event in application window or during macro execution";
+            return CallNextHookEx(keyboardHook, nCode, wParam, lParam); // Ignore key events
+        }
+
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
             qDebug() << "Key Pressed Globally:" << key;
-            if (triggerKeyToMacroCode.find(key) != triggerKeyToMacroCode.end()) {
-                qDebug() << "Global Macro found for key:" << key << "with macro code:" << triggerKeyToMacroCode[key];
-                // Execute the macro using the instance pointer
-                QString macroCode = triggerKeyToMacroCode[key];
-                auto sequence = instance->parseMacroCode(macroCode); // Use instance to call non-static member function
-                instance->executeMacro(sequence); // Use instance to call non-static member function
+            if (macroList.find(key) != macroList.end()) {
+                qDebug() << "Global Macro found for key:" << key << "with macro code:" << macroList[key];
+                // Ensure the application is not in focus before executing the macro
+                if (foregroundWindow != appWindowHandle) {
+                    qDebug() << "Executing macro for key:" << key;
+                    QString macroCode = macroList[key];
+                    auto sequence = instance->parseActions(macroCode);
+                    instance->executeMacro(sequence);
+                }
                 return 1; // Block the key event
             }
         }
@@ -66,42 +99,24 @@ LRESULT CALLBACK AppController::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
     return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
 }
 
-bool AppController::eventFilter(QObject *obj, QEvent *event) {
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        QString key = QKeySequence(keyEvent->modifiers() | keyEvent->key()).toString();
-        qDebug() << "Key Pressed:" << key;
-        if (triggerKeyToMacroCode.find(key) != triggerKeyToMacroCode.end()) {
-            qDebug() << "Macro found for key:" << key << "with macro code:" << triggerKeyToMacroCode[key];
-            handleKeyPress(keyEvent);
-            return true; // Event handled
-        } else {
-            qDebug() << "No macro found for key:" << key;
+std::pair<QString, QString> AppController::seperateTriggerAndActions(const QString &macroCode) {
+    QString triggerKey;
+    QString actions;
+    bool sw = true;
+    for(int i = 0; i < macroCode.length(); i++) {
+        if(macroCode[i] == '-' ) {
+            i++;
+            sw = false;
+            continue;
         }
-    }
-    return QObject::eventFilter(obj, event); // Standard event processing for other keys
-}
 
-void AppController::handleKeyPress(QKeyEvent *event) {
-    QString key = QKeySequence(event->modifiers() | event->key()).toString();
-    qDebug() << "Handling key press for key:" << key;
-    if (triggerKeyToMacroCode.find(key) != triggerKeyToMacroCode.end()) {
-        QString macroCode = triggerKeyToMacroCode[key];
-        qDebug() << "Executing macro code:" << macroCode;
-        auto sequence = parseMacroCode(macroCode);
-        executeMacro(sequence);
-    }
-}
+        if(sw)
+            triggerKey += macroCode[i];
+        else
+            actions += macroCode[i];
 
-std::pair<QString, QString> AppController::extractTriggerKey(const QString &macroCode) {
-    QRegularExpression regex(R"(([^->]+)->(.+))");
-    QRegularExpressionMatch match = regex.match(macroCode);
-    if (match.hasMatch()) {
-        QString triggerKey = match.captured(1).trimmed();
-        QString actions = match.captured(2).trimmed();
-        return {triggerKey, actions};
     }
-    return {"", macroCode}; // If the format is incorrect, return the whole macroCode as actions
+    return {triggerKey, actions};
 }
 
 void AppController::onKbMacrosWindowLoaded() {
@@ -170,7 +185,7 @@ void AppController::printListModelElements(QAbstractListModel *listModel) {
         QVariant macroName = listModel->data(index, listModel->roleNames().key("macroName"));
         QVariant macroCode = listModel->data(index, listModel->roleNames().key("macroCode"));
 
-        auto [triggerKey, actions] = extractTriggerKey(macroCode.toString());
+        auto [triggerKey, actions] = seperateTriggerAndActions(macroCode.toString());
 
         qDebug() << "Macro Name:" << macroName.toString()
                  << ", Macro Code:" << macroCode.toString()
@@ -178,27 +193,42 @@ void AppController::printListModelElements(QAbstractListModel *listModel) {
     }
 }
 
-std::vector<std::pair<char, int>> AppController::parseMacroCode(const QString &macroCode) {
-    auto [triggerKey, actions] = extractTriggerKey(macroCode);
-    std::vector<std::pair<char, int>> sequence;
-    std::regex pattern(R"(([A-Z])\((\d+)\))");
-    std::string code = actions.toStdString();
-    auto matches = std::sregex_iterator(code.begin(), code.end(), pattern);
-    auto end = std::sregex_iterator();
+std::vector<std::pair<char, int>> AppController::parseActions(const QString &macroCode) {
+    std::vector<std::pair<char, int>> actionSeq;
+    std::string s = macroCode.toStdString();
+    std::string numStr;
+    char key;
+    transform(s.begin(), s.end(), s.begin(),
+              ::tolower);
+    bool sw = true;
 
-    for (std::sregex_iterator i = matches; i != end; ++i) {
-        std::smatch match = *i;
-        char key = match.str(1)[0];
-        int delay = std::stoi(match.str(2));
-        sequence.emplace_back(key, delay);
+    for(int i = 0; i < s.length(); i++) {
+        if(s[i] == '(') {
+            sw = false;
+            continue;
+        }
+
+        if(s[i] == ')') {
+            sw = true;
+            actionSeq.emplace_back(key, std::stoi(numStr));
+            numStr = "";
+            continue;
+        }
+
+        if(sw) {
+            key = s[i];
+        } else {
+            numStr += s[i];
+        }
     }
 
-    return sequence;
+    return actionSeq;
 }
 
 void AppController::executeMacro(const std::vector<std::pair<char, int>> &sequence) {
     // Disable the hook to prevent recursive triggering
     DisableHook();
+    isMacroExecuting = true;
 
     for (const auto &action : sequence) {
         char key = action.first;
@@ -219,21 +249,23 @@ void AppController::executeMacro(const std::vector<std::pair<char, int>> &sequen
     }
 
     // Re-enable the hook after execution
+    isMacroExecuting = false;
     EnableHook();
 }
 
 void AppController::updateMacros(QAbstractListModel *listModel) {
-    triggerKeyToMacroCode.clear();  // Clear existing mappings
+    macroList.clear();  // Clear existing mappings
 
     for (int i = 0; i < listModel->rowCount(); ++i) {
         QModelIndex index = listModel->index(i);
         QVariant macroCode = listModel->data(index, listModel->roleNames().key("macroCode"));
 
-        auto [triggerKey, actions] = extractTriggerKey(macroCode.toString());
+        std::pair<QString, QString> macro = seperateTriggerAndActions(macroCode.toString());
 
-        if (!triggerKey.isEmpty() && !actions.isEmpty()) {
-            qDebug() << "Storing macro for key:" << triggerKey << "with actions:" << actions;
-            triggerKeyToMacroCode[triggerKey] = actions;
+        // macro.first -> triggerkey, macro.second -> the actions
+        if (!macro.first.isEmpty() && !macro.second.isEmpty()) {
+            qDebug() << "Storing macro for key:" << macro.first << "with actions:" << macro.second;
+            macroList[macro.first] = macro.second;
         }
     }
 
