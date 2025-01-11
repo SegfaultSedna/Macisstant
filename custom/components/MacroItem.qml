@@ -15,7 +15,7 @@ Rectangle {
     signal deleteButtonClicked()
     signal checkStateChanged(int state)
 
-    border.color: "#ecf0f1"
+    border.color: "#e1ddf4"
     border.width: 2
     radius: 4
     width: containerWidth
@@ -46,7 +46,7 @@ Rectangle {
         id: createMacroText
         anchors { verticalCenter: parent.verticalCenter; left: checkBox.right }
         text: macroItem.macroName
-        color: "#ecf0f1"
+        color: "#e1ddf4"
         font.family: "Segoe UI"
         font.pixelSize: 14
         font.bold: true

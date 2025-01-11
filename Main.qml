@@ -119,7 +119,7 @@ Window {
             font.family: "Segoe UI"
             font.pixelSize: 32
             font.bold: true
-            color: "#ecf0f1"
+            color: "#e1ddf4"
 
             property int currentIndex: 0
             signal typingFinished
@@ -155,7 +155,7 @@ Window {
         MainButton {
             id: kbMacrosButton
             buttonText: "Keyboard macros"
-            buttonColor: "#ecf0f1"
+            buttonColor: "#e1ddf4"
             anchors.centerIn: parent
             onClicked: {
                 mainWindowFadeOut.start();

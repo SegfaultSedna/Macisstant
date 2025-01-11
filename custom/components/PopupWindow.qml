@@ -6,7 +6,7 @@ Item {
     id: popupWindow
     Material.theme: Material.Dark
     property string popupText: "Popup text"
-    property string popupTextColor: "#ecf0f1"
+    property string popupTextColor: "#e1ddf4"
     property int popupTextSize: 22
     property int borderWidth: 2
     property int borderRadius: 4
@@ -22,7 +22,7 @@ Item {
         anchors.fill: parent
         border.width: popupWindow.borderWidth
         radius: popupWindow.borderRadius
-        color: "black"
+        color: "#322854"
         opacity: 0.95
     }
 
@@ -53,7 +53,7 @@ Item {
             id: okButton
             hasAppearAnimation: false
             buttonText: "OK"
-            buttonColor: "#ecf0f1"
+            buttonColor: "#e1ddf4"
             buttonWidth: 100
             buttonHeight: 30
 
@@ -64,7 +64,7 @@ Item {
             id: cancelButton
             hasAppearAnimation: false
             buttonText: "Cancel"
-            buttonColor: "#ecf0f1"
+            buttonColor: "#e1ddf4"
             buttonWidth: 100
             buttonHeight: 30
 

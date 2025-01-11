@@ -23,7 +23,7 @@ Item {
         anchors.fill: kbMacrosWindow
         shadowBlur: 0.4
         shadowEnabled: true
-        shadowColor: "black"
+        shadowColor: "#322854"
         shadowVerticalOffset: 4
         shadowHorizontalOffset: 4
         opacity: 0
@@ -75,7 +75,7 @@ Item {
         color: "transparent"
         width: parent.width / 2.5
         height: parent.height - 60 - topButtonContainer.height
-        border.color: "#ecf0f1"
+        border.color: "#e1ddf4"
         border.width: 2
         radius: 4
 
@@ -107,8 +107,8 @@ Item {
                         width: 130
                         height: 27
                         hasHoverText: index === 0 // Use index directly here
-                        inputColor: "black"
-                        labelColor: "black"
+                        inputColor: "#322854"
+                        labelColor: "#322854"
                         bgColor: "#cac5ed"
                         borderColor: "#e1ddf4"
                     }
@@ -125,7 +125,7 @@ Item {
                 id: createMacroText
                 anchors { top: parent.top; left: parent.left; topMargin: 12; leftMargin: 12 }
                 text: "Create Macro"
-                color: "#ecf0f1"
+                color: "#e1ddf4"
                 font.family: "Segoe UI"
                 font.pixelSize: 22
                 font.bold: true
@@ -231,7 +231,7 @@ Item {
         color: "transparent"
         width: parent.width / 1.82
         height: parent.height - 60 - topButtonContainer.height
-        border.color: "#ecf0f1"
+        border.color: "#e1ddf4"
         border.width: 2
         radius: 4
 
@@ -273,7 +273,7 @@ Item {
             Label {
                 id: yourMacrosText
                 text: "Your Macros"
-                color: "#ecf0f1"
+                color: "#e1ddf4"
                 font.family: "Segoe UI"
                 font.pixelSize: 22
                 font.bold: true

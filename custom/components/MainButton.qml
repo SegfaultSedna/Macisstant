@@ -24,7 +24,7 @@ Rectangle {
     Rectangle {
         id: buttonFill
         anchors.fill: parent
-        color: "white"
+        color: "#e1ddf4"
         opacity: 0
         z: 1
 
@@ -117,7 +117,7 @@ Rectangle {
         target: mainButtonText
         property: "color"
         from: mainButton.buttonColor
-        to: "#1e272e"
+        to: "#322854"
         duration: 200
     }
 
@@ -125,7 +125,7 @@ Rectangle {
         id: mainButtonTextColorChangeReverse
         target: mainButtonText
         property: "color"
-        from: "#1e272e"
+        from: "#322854"
         to: mainButton.buttonColor
         duration: 200
     }

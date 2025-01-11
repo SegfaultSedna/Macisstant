@@ -81,7 +81,7 @@ FocusScope {
 
         TextInput {
             id: textInput
-            color: "black"
+            color: "#322854"
             z: 1
             validator: IntValidator {
                 bottom: 0
@@ -101,14 +101,14 @@ FocusScope {
             id: placeholder
             anchors.centerIn: parent
             text: qsTr("wait (ms)")
-            color: "white"
+            color: "#e1ddf4"
             visible: textInput.text.length === 0
         }
 
         Label {
             id: hoverText
             text: "delay"
-            color: "white"
+            color: "#e1ddf4"
             font.family: "Segoe UI"
             font.pixelSize: 14
             font.bold: true

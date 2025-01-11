@@ -111,7 +111,7 @@ FocusScope {
 
         TextInput {
             id: textInput
-            color: "black"
+            color: "#322854"
             font.family: "Segoe UI"
             font.pixelSize: 12
             font.bold: true
@@ -189,7 +189,7 @@ FocusScope {
         Label {
             id: hoverText
             text: keyTextInput.hoverCustomText
-            color: "white"
+            color: "#e1ddf4"
             font.family: "Segoe UI"
             font.pixelSize: 14
             font.bold: true

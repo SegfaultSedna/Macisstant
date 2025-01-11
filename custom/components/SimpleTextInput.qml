@@ -6,8 +6,8 @@ FocusScope {
     implicitWidth: 200
     implicitHeight: 100
     property string bgColor: "#1abc9c"
-    property string borderColor: "#ecf0f1"
-    property string fontColor: "#ecf0f1"
+    property string borderColor: "#e1ddf4"
+    property string fontColor: "#e1ddf4"
     property int fontSize: 12
     property int borderRadius: 4
     property int borderWidth: 2
@@ -55,7 +55,7 @@ FocusScope {
             id: placeholder
             anchors.centerIn: parent
             text: qsTr("Macro name")
-            color: "white"
+            color: "#e1ddf4"
             visible: textInput.text.length === 0
         }
 
