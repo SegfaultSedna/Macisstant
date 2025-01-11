@@ -40,6 +40,7 @@ qt_add_qml_module(appMacisstantQML_cmake
         custom/images/save.svg
         custom/images/settings.svg
         custom/images/square-check-big.svg
+        custom/images/confused.svg
         custom/images/appicon.ico
     SOURCES
         AppController.h

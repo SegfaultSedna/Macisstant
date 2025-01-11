@@ -6,8 +6,10 @@ FocusScope {
     id: keyTextInput
     implicitWidth: 80
     implicitHeight: 32
-    property string bgColor: "#dfe6e9"
-    property string borderColor: "#ecf0f1"
+    property alias bgColor: rect.color
+    property alias borderColor: rect.border.color
+    property alias inputColor: textInput.color
+    property alias labelColor: placeholder.color
     property string hoverCustomText: "hover text"
     property string mainText: "add key"
     property string textInputValue: ""
@@ -179,7 +181,7 @@ FocusScope {
                 id: placeholder
                 anchors.centerIn: parent
                 text: keyTextInput.mainText
-                color: "white"
+                color: keyTextInput.labelColor
                 visible: textInput.text.length === 0
             }
         }

@@ -21,7 +21,7 @@ Item {
         id: macroWindowItemsShadow
         source: kbMacrosWindow
         anchors.fill: kbMacrosWindow
-        shadowBlur: 1.1
+        shadowBlur: 0.4
         shadowEnabled: true
         shadowColor: "black"
         shadowVerticalOffset: 4
@@ -107,6 +107,10 @@ Item {
                         width: 130
                         height: 27
                         hasHoverText: index === 0 // Use index directly here
+                        inputColor: "black"
+                        labelColor: "black"
+                        bgColor: "#cac5ed"
+                        borderColor: "#e1ddf4"
                     }
 
                     onItemAdded: (index, item) => {
@@ -142,8 +146,10 @@ Item {
                 width: 80
                 height: 27
                 anchors { left: createMacroText.left; top: macroNameInput.bottom; topMargin: 22 }
-                bgColor: "#8e44ad"
-                borderColor: "#ecf0f1"
+                bgColor: "#514283"
+                inputColor: "#e1ddf4"
+                borderColor: "#e1ddf4"
+                labelColor: "#e1ddf4"
                 hoverCustomText: "On key"
                 mainText: "add key"
             }
@@ -244,9 +250,10 @@ Item {
             id: deletePopup
             popupText: "Are you sure?"
             popupTextSize: 32
-            popupTextColor: "#e74c3c"
+            popupTextColor: "#f0c3e2"
+            borderWidth: 0
+            borderRadius: 0
             property int indexToDelete
-            z: 2
 
             onOkButtonClicked: {
                 visible = false
@@ -351,7 +358,7 @@ Item {
             target: kbMacrosWindow
             property: "opacity"
             from: 0
-            to: 0.8
+            to: 1
             duration: 800
             easing.type: Easing.InOutCirc
         }
@@ -359,7 +366,7 @@ Item {
             target: macroWindowItemsShadow
             property: "opacity"
             from: 0
-            to: 0.8
+            to: 0.4
             duration: 800
             easing.type: Easing.InOutCirc
         }

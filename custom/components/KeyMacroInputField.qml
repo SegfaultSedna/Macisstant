@@ -5,6 +5,10 @@ Item {
     id: keyMacroInputField
     property bool hasHoverText: true
     property string inputCode: useKeyInput.textInputValue + "(" + delayInput.textInputValue + ")"
+    property string bgColor
+    property string inputColor
+    property string labelColor
+    property string borderColor
 
     KeyTextInput {
         id: useKeyInput
@@ -12,8 +16,11 @@ Item {
         height: 27
         hoverCustomText: "Use key"
         mainText: "add key"
-        bgColor: "#1abc9c"
+        bgColor: keyMacroInputField.bgColor
         hasHoverText: keyMacroInputField.hasHoverText
+        inputColor: keyMacroInputField.inputColor
+        labelColor: keyMacroInputField.labelColor
+        borderColor: keyMacroInputField.borderColor
     }
 
 
@@ -24,8 +31,11 @@ Item {
         anchors.top: useKeyInput.top
         anchors.left: useKeyInput.right
         anchors.leftMargin:4
-        bgColor: "#1abc9c"
+        bgColor: keyMacroInputField.bgColor
         hasHoverText: keyMacroInputField.hasHoverText
+        inputColor: keyMacroInputField.inputColor
+        labelColor: keyMacroInputField.labelColor
+        borderColor: keyMacroInputField.borderColor
     }
 
     function clearKeyInputText() {

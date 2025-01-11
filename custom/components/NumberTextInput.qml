@@ -5,8 +5,10 @@ FocusScope {
     id: numberTextInput
     implicitWidth: 80
     implicitHeight: 32
-    property string bgColor: "#1abc9c"
-    property string borderColor: "#ecf0f1"
+    property alias bgColor: rect.color
+    property alias borderColor: rect.border.color
+    property alias inputColor: textInput.color
+    property alias labelColor: placeholder.color
     property string textInputValue: textInput.text ? textInput.text : "0"
     property bool hasHoverText: true
 
