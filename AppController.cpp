@@ -265,9 +265,9 @@ void AppController::executeMacro(QString& QSTR_actions) {
             x++;
         }
 
-        if (x < actions.length() && actions[x] == ')') {
+        /*if (x < actions.length() && actions[x] == ')') {
             actionfull += actions[x++];
-        }
+        }*/
 
         // Convert delay string to integer
         if (!delaystr.empty()) {
@@ -304,6 +304,7 @@ void AppController::executeMacro(QString& QSTR_actions) {
             std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         }
 
+        x++;
         parsingDelay = false;
     }
 

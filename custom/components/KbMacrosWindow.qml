@@ -407,7 +407,7 @@ Item {
 
             onEditRequested:(index, name, code) => {
                 //let test = macroItemModel.get(index).macroCode.toString()
-                const regex = /((CTRL\+|ALT\+|SHIFT\+)*)?[a-zA-Z]->((CTRL\+|ALT\+|SHIFT\+)*)?[a-zA-Z]\(\d+\).*/;
+                const regex = new RegExp('^((CTRL\\+|SHIFT\\+|ALT\\+)*[A-Z0-9])->((CTRL\\+|SHIFT\\+|ALT\\+)*[A-Z0-9]\\(\\d+\\))+');
                 if(regex.test(macroItemModel.get(index).macroCode)) {
                     macroItemModel.get(index).macroName = name;
                     editPopup.visible = false;
