@@ -24,7 +24,7 @@ public slots:
 
 private:
     void printListModelElements(QAbstractListModel *listModel);
-    void executeMacro(const std::vector<std::pair<char, int>> &sequence);
+    void executeMacro(QString& QSTR_actions);
     std::vector<std::pair<char, int>> parseActions(const QString &macroCode);
     std::pair<QString, QString> seperateTriggerAndActions(const QString &macroCode);
     void updateMacros(QAbstractListModel *listModel);

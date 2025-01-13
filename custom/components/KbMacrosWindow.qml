@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Effects
+import QtQuick.Dialogs
 
 Item {
     id: kbMacrosWindow
@@ -57,8 +58,84 @@ Item {
             iconSource: "../images/save.svg"
             iconSize: kbMacrosWindow.iconBaseSize
             anchors { left: homeButton.right; leftMargin: 4; verticalCenter: parent.verticalCenter }
+
+            FileDialog {
+                    id: fileDialog
+                    title: "Export keyboard macros"
+                    acceptLabel: "Save"
+                    rejectLabel: "Cancel"
+                    defaultSuffix: "json"
+                    fileMode: FileDialog.SaveFile
+                    nameFilters: ["JSON Files (*.json)", "All Files (*)"]
+
+                    onAccepted: {
+                        if (selectedFile !== "") {
+                            saveToFile(selectedFile.toString())
+                        }
+                    }
+                    onRejected: {
+                        console.log("File save canceled")
+                    }
+
+                    function saveToFile(fileUrl) {
+                        var data = []
+                        for (var i = 0; i < macroItemModel.count; i++) {
+                            data.push(macroItemModel.get(i))
+                        }
+                        var jsonString = JSON.stringify(data)
+                        let filePathFixed = fileUrl.slice(8);
+                        fileOperator.saveToFile(filePathFixed, jsonString)
+                    }
+                }
+
+            onClicked: {
+                fileDialog.open();
+            }
         }
 
+        IconButton {
+            id: importButton
+            iconSource: "../images/import-line.svg"
+            iconSize: kbMacrosWindow.iconBaseSize
+            anchors { left: saveButton.right; leftMargin: 4; verticalCenter: parent.verticalCenter }
+
+            FileDialog {
+                id: importFileDialog
+                title: "Import keyboard macros"
+                acceptLabel: "Open"
+                rejectLabel: "Cancel"
+                fileMode: FileDialog.OpenFile
+                nameFilters: ["JSON Files (*.json)", "All Files (*)"]
+
+                onAccepted: {
+                    if (selectedFile !== "") {
+                        importFromFile(selectedFile.toString())
+                    } else {
+                        console.log("No file selected")
+                    }
+                }
+                onRejected: {
+                    console.log("File import canceled")
+                }
+
+                function importFromFile(fileUrl) {
+                    let filePathFixed = fileUrl.slice(8);
+                    var importedData = fileOperator.importFromFile(filePathFixed)
+                    if (importedData) {
+                        for (var i = 0; i < importedData.length; i++) {
+                            macroItemModel.append(importedData[i])
+                        }
+                        console.log("File imported successfully from " + filePathFixed)
+                    } else {
+                        console.log("Failed to import file from " + filePathFixed)
+                    }
+                }
+            }
+
+            onClicked: {
+                importFileDialog.open()
+            }
+        }
 
         IconButton {
             id: settingsButton
@@ -126,9 +203,7 @@ Item {
                 anchors { top: parent.top; left: parent.left; topMargin: 12; leftMargin: 12 }
                 text: "Create Macro"
                 color: "#e1ddf4"
-                font.family: "Segoe UI"
-                font.pixelSize: 22
-                font.bold: true
+                font { family: "Segoe UI"; pixelSize: 22; bold: true }
                 opacity: 1
             }
 
@@ -188,12 +263,12 @@ Item {
 
             IconButton {
                 id: createButton
-                iconSource: "../images/square-check-big.svg"
+                iconSource: "../images/check.svg"
                 anchors.left: createMacroText.right
                 anchors.top: createMacroText.top
                 anchors.leftMargin: 6
-                anchors.topMargin: 6
-                iconSize: 22
+                anchors.topMargin: 4
+                iconSize: 26
                 onClicked: {
 
                     var combined = ""
@@ -253,6 +328,10 @@ Item {
             popupTextColor: "#f0c3e2"
             borderWidth: 0
             borderRadius: 0
+            imageOffset: 42 // from top of the window
+            textOffset: 6 // from the image
+            buttonOffset: 72 // from the bottom of the window
+
             property int indexToDelete
 
             onOkButtonClicked: {
@@ -261,6 +340,88 @@ Item {
             }
             onCancelButtonClicked: visible = false
         }
+
+        PopupWindow {
+            id: editPopup
+            popupText: "Edit macro"
+            popupTextSize: 32
+            popupTextColor: "#f0c3e2"
+            borderWidth: 0
+            borderRadius: 0
+            imageOffset: 22
+            textOffset: 6
+            buttonOffset: 46
+
+            property int indexToEdit
+            signal editRequested(int index, string name, string code)
+
+            Label {
+                id: nameText
+                text: "Macro name"
+                color: "#e1ddf4"
+                font { family: "Segoe UI"; pixelSize: 15; bold: true }
+                opacity: 1
+                anchors { left: editNameInput.left; bottom: editNameInput.top; bottomMargin: 4 }
+            }
+
+            Label {
+                id: codeText
+                text: "Macro code"
+                color: "#e1ddf4"
+                font { family: "Segoe UI"; pixelSize: 15; bold: true }
+                opacity: 1
+                anchors { left: editMacroCodeInput.left; bottom: editMacroCodeInput.top; bottomMargin: 4 }
+            }
+
+            SimpleTextInput {
+                id: editNameInput
+                placeholderText: ""
+                fontSize: 15
+                hasHoverText: false
+                anchors { top: parent.top; topMargin: 260; horizontalCenter: parent.horizontalCenter }
+                width: 270
+                height: 36
+            }
+
+            SimpleTextInput {
+                id: editMacroCodeInput
+                placeholderText: ""
+                onlyUpperCaseText: true
+                errorText: "Invalid macro format"
+                fontSize: 15
+                maximumLength: 1024
+                hasHoverText: false
+                anchors { top: editNameInput.bottom; topMargin: 42; horizontalCenter: parent.horizontalCenter }
+                width: 270
+                height: 36
+            }
+
+            onCancelButtonClicked: {
+                editPopup.visible = false
+            }
+
+            onOkButtonClicked: {
+                editRequested(indexToEdit, editNameInput.textInputValue, editMacroCodeInput.textInputValue);
+                console.log(editNameInput.textInputValue + ", " + editMacroCodeInput.textInputValue)
+            }
+
+            onEditRequested:(index, name, code) => {
+                //let test = macroItemModel.get(index).macroCode.toString()
+                const regex = /(CTRL\+|ALT\+|SHIFT\+)[a-zA-Z]->(CTRL\+|ALT\+|SHIFT\+)?[a-zA-Z]\(\d+\).*/;
+                if(regex.test(macroItemModel.get(index).macroCode)) {
+                    macroItemModel.get(index).macroName = name;
+                    editPopup.visible = false;
+                    macroItemModel.get(index).macroCode = code;
+                    console.log("regex matched");
+                }
+                else {
+                    editMacroCodeInput.triggerErrorAnimation();
+                }
+
+            }
+
+        }
+
 
         ScrollView {
             id: listMacroScroll
@@ -274,9 +435,7 @@ Item {
                 id: yourMacrosText
                 text: "Your Macros"
                 color: "#e1ddf4"
-                font.family: "Segoe UI"
-                font.pixelSize: 22
-                font.bold: true
+                font { family: "Segoe UI"; pixelSize: 22; bold: true }
                 opacity: 1
                 anchors { left: parent.left; top: parent.top; leftMargin: 12; topMargin: 12 }
             }
@@ -318,6 +477,12 @@ Item {
                         containerWidth: macroListContainer.width/1.5
                         // macroItemModel.get(index).macroCode
 
+                        onEditButtonClicked: {
+                            editPopup.visible = true;
+                            editNameInput.textInputValue = macroName;
+                            editMacroCodeInput.textInputValue = macroCode;
+                            editPopup.indexToEdit = index;
+                        }
 
                         onDeleteButtonClicked: {
                             deletePopup.indexToDelete = index

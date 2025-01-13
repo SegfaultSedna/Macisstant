@@ -6,12 +6,15 @@
 #include <QDebug>
 #include <QAbstractListModel>
 #include "AppController.h"
+#include "FileOperator.h"
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
     AppController appController(&engine);
+    FileOperator fileOperator;
+    engine.rootContext()->setContextProperty("fileOperator", &fileOperator);
 
     QObject::connect(
         &engine,

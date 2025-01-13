@@ -16,7 +16,7 @@ Rectangle {
     border.color: buttonColor
     border.width: 2
     color: "transparent"
-    radius: 1
+    radius: 4
     opacity: hasAppearAnimation ? 0 : 1
 
     signal clicked
@@ -26,6 +26,7 @@ Rectangle {
         anchors.fill: parent
         color: "#e1ddf4"
         opacity: 0
+        radius: mainButton.radius
         z: 1
 
         PropertyAnimation {
@@ -53,9 +54,7 @@ Rectangle {
         id: mainButtonText
         anchors.centerIn: parent  // Center the text inside the Rectangle
         text: mainButton.buttonText
-        font.family: "Segoe UI"
-        font.pixelSize: mainButton.buttonFontSize
-        font.bold: true
+        font { family: "Segoe UI"; pixelSize: mainButton.buttonFontSize; bold: true }
         color: mainButton.buttonColor
         z: 2  // Ensure the text is above the buttonFill rectangle
     }

@@ -10,6 +10,9 @@ Item {
     property int popupTextSize: 22
     property int borderWidth: 2
     property int borderRadius: 4
+    property int imageOffset //115
+    property int textOffset // 0
+    property int buttonOffset // 90
     property bool hasButtons: true
     z: 100
     signal okButtonClicked
@@ -22,7 +25,7 @@ Item {
         anchors.fill: parent
         border.width: popupWindow.borderWidth
         radius: popupWindow.borderRadius
-        color: "#322854"
+        color: "black"
         opacity: 0.95
     }
 
@@ -32,23 +35,21 @@ Item {
         source: "../images/confused.svg" // Use the dynamic image path
         sourceSize.width: 160
         sourceSize.height: 140
-        anchors { centerIn: parent; verticalCenterOffset: -115 }
+        anchors { top: parent.top; topMargin: popupWindow.imageOffset; horizontalCenter: parent.horizontalCenter }
     }
 
     Label {
         id: popupWindowText
         text: popupWindow.popupText
         color: popupWindow.popupTextColor
-        font.family: "Segoe UI"
-        font.pixelSize: popupWindow.popupTextSize
-        font.bold: true
+        font { family: "Segoe UI"; pixelSize: popupWindow.popupTextSize; bold: true }
         opacity: 1
-        anchors { centerIn: parent; verticalCenterOffset: 0 }
+        anchors { top: image.bottom; topMargin: popupWindow.textOffset; horizontalCenter: parent.horizontalCenter }
     }
 
     Row {
         spacing: 16
-        anchors { centerIn: parent; verticalCenterOffset: 90 }
+        anchors { bottom: parent.bottom; bottomMargin: popupWindow.buttonOffset; horizontalCenter: parent.horizontalCenter }
         MainButton {
             id: okButton
             hasAppearAnimation: false

@@ -87,9 +87,7 @@ FocusScope {
                 bottom: 0
                 top: 999999  // Accept numbers from 0 to 999999
             }
-            font.family: "Segoe UI"
-            font.pixelSize: 12
-            font.bold: true
+            font { family: "Segoe UI"; pixelSize: 12; bold: true }
             anchors.centerIn: parent
             activeFocusOnTab: true
             onTextChanged: {
@@ -109,9 +107,7 @@ FocusScope {
             id: hoverText
             text: "delay"
             color: "#e1ddf4"
-            font.family: "Segoe UI"
-            font.pixelSize: 14
-            font.bold: true
+            font { family: "Segoe UI"; pixelSize: 14; bold: true }
             opacity: 0
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: rect.top

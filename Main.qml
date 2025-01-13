@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Effects
+import Qt.labs.platform
 //import "global.js" as GlobalFunctions
 
 Window {

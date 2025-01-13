@@ -13,7 +13,6 @@ qt_standard_project_setup(REQUIRES 6.5)
 set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/custom/resources.rc")
 qt_add_executable(appMacisstantQML_cmake WIN32
     main.cpp
-    AppController.cpp
     ${app_icon_resource_windows}
 )
 
@@ -35,15 +34,19 @@ qt_add_qml_module(appMacisstantQML_cmake
         custom/images/arrow-down.svg
         custom/images/bg.jpg
         custom/images/close-line.svg
-        custom/images/edit-fill.svg
         custom/images/home.svg
         custom/images/save.svg
+        custom/images/edit-fill.svg
+        custom/images/check.svg
         custom/images/settings.svg
-        custom/images/square-check-big.svg
         custom/images/confused.svg
         custom/images/appicon.ico
+        custom/images/import-line.svg
     SOURCES
         AppController.h
+        AppController.cpp
+        FileOperator.h
+        FileOperator.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

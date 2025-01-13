@@ -112,9 +112,7 @@ FocusScope {
         TextInput {
             id: textInput
             color: "#322854"
-            font.family: "Segoe UI"
-            font.pixelSize: 12
-            font.bold: true
+            font { family: "Segoe UI"; pixelSize: 12; bold: true }
             anchors.centerIn: parent
             activeFocusOnTab: true
             z: 1
@@ -190,9 +188,7 @@ FocusScope {
             id: hoverText
             text: keyTextInput.hoverCustomText
             color: "#e1ddf4"
-            font.family: "Segoe UI"
-            font.pixelSize: 14
-            font.bold: true
+            font { family: "Segoe UI"; pixelSize: 14; bold: true }
             opacity: 0
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: rect.top

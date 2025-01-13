@@ -14,6 +14,7 @@ Rectangle {
 
     signal deleteButtonClicked()
     signal checkStateChanged(int state)
+    signal editButtonClicked()
 
     border.color: "#e1ddf4"
     border.width: 2
@@ -47,9 +48,7 @@ Rectangle {
         anchors { verticalCenter: parent.verticalCenter; left: checkBox.right }
         text: macroItem.macroName
         color: "#e1ddf4"
-        font.family: "Segoe UI"
-        font.pixelSize: 14
-        font.bold: true
+        font { family: "Segoe UI"; pixelSize: 14; bold: true }
         opacity: 1
     }
 
@@ -58,6 +57,10 @@ Rectangle {
         iconSize: 20
         source: "../images/edit-fill.svg"
         anchors { verticalCenter: parent.verticalCenter; right: deleteMacroButton.left; rightMargin: 6}
+
+        onClicked: {
+            macroItem.editButtonClicked();
+        }
     }
 
     IconButton {
