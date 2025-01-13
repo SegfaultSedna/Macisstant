@@ -124,16 +124,16 @@ FocusScope {
             function keyToString(event) {
                 var modifiers = ""
                 if (event.modifiers & Qt.ControlModifier) {
-                    modifiers += "Ctrl+"
+                    modifiers += "CTRL+"
                 }
                 if (event.modifiers & Qt.ShiftModifier) {
-                    modifiers += "Shift+"
+                    modifiers += "SHIFT+"
                 }
                 if (event.modifiers & Qt.AltModifier) {
-                    modifiers += "Alt+"
+                    modifiers += "ALT+"
                 }
                 if (event.modifiers & Qt.MetaModifier) {
-                    modifiers += "Meta+"
+                    modifiers += "META+"
                 }
                 return modifiers
             }

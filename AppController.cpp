@@ -241,10 +241,10 @@ void AppController::executeMacro(QString& QSTR_actions) {
     inputCTRL.ki.wVk = VK_CONTROL; // Virtual key code for Ctrl
 
     // Map of key inputs and their corresponding actions
-    std::unordered_map<char, INPUT*> keyMap = {
-        {'A', &inputALT},
-        {'S', &inputSHIFT},
-        {'C', &inputCTRL}
+    std::unordered_map<std::string, INPUT*> keyMap = {
+        {"ALT", &inputALT},
+        {"SHIFT", &inputSHIFT},
+        {"CTRL", &inputCTRL}
     };
 
     while (x < actions.length()) {
