@@ -385,7 +385,7 @@ std::list<int> seperateAndConvertActions(QString& QSTR_actions) {
 }
 
 void AppController::updateMacros(QAbstractListModel *listModel) {
-    macroList.clear();  // Clear existing mappings
+    parsedActionMap.clear();  // Clear existing mappings
 
     for (int i = 0; i < listModel->rowCount(); ++i) {
         QModelIndex index = listModel->index(i);

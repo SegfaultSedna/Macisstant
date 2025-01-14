@@ -43,6 +43,7 @@ qt_add_qml_module(appMacisstantQML_cmake
         custom/images/scared.svg
         custom/images/sad.svg
         custom/images/happy.svg
+        custom/images/smart.svg
         custom/images/appicon.ico
         custom/images/import-line.svg
     SOURCES

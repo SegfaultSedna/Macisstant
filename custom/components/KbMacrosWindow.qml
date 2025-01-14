@@ -335,12 +335,41 @@ Item {
         signal deleteRequested(int index)
         property bool isEmpty: macroItemModel.count
 
+
+        PopupWindow {
+            id: helpPopup
+            popupText: "Remember the macro code syntax is:\non key->use key(delay)\n\n\nmodifiers+key->modifiers+key(delay)\nExample: F2->ALT+W(0)R(40)\n"
+            popupTextSize: 18
+            popupTextColor: "#f0c3e2"
+            borderWidth: 0
+            borderRadius: 0
+            imageURL: "../images/smart.svg"
+            hasButtons: true
+            imageOffset: 42 // from top of the window
+            textOffset: 6 // from the image
+            buttonOffset: 72 // from the bottom of the window
+            onOkButtonClicked: helpPopup.visible = false
+            onCancelButtonClicked: helpPopup.visible = false
+        }
+
         Image {
             id: image
             source: macroListContainer.isEmpty ? "../images/happy.svg" : "../images/sad.svg"
             sourceSize.width: 60
             sourceSize.height: 55
             anchors { right: parent.right; top: parent.top; topMargin: 8; rightMargin: 18 }
+            z: 20
+
+            MouseArea {
+                id: mouseArea
+                anchors.fill: parent
+                z: 2000
+                onClicked: {
+                    console.log(clicked)
+                    helpPopup.visible = true;
+                }
+            }
+
         }
 
 
@@ -420,7 +449,7 @@ Item {
                 id: editMacroCodeInput
                 placeholderText: ""
                 onlyUpperCaseText: true
-                errorText: "Invalid macro format"
+                errorText: "Invalid macro code syntax"
                 fontSize: 15
                 maximumLength: 1024
                 hasHoverText: false
@@ -440,7 +469,7 @@ Item {
 
             onEditRequested:(index, name, code) => {
                 //let test = macroItemModel.get(index).macroCode.toString()
-                const regex = new RegExp('^((CTRL\\+|SHIFT\\+|ALT\\+)*[A-Z0-9])->(((CTRL\\+|SHIFT\\+|ALT\\+)*[A-Z0-9]\\(\\d+\\))+)$');
+                const regex = new RegExp('^((CTRL\\+|SHIFT\\+|ALT\\+){0,3}[A-Z0-9]+)->((CTRL\\+|SHIFT\\+|ALT\\+){0,3}[A-Z0-9]+\\(\\d+\\))+$');
                 if(regex.test(editMacroCodeInput.textInputValue)) {
                     macroItemModel.get(index).macroName = name;
                     editPopup.visible = false;

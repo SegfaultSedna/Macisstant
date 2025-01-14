@@ -42,6 +42,9 @@ Item {
         id: popupWindowText
         text: popupWindow.popupText
         color: popupWindow.popupTextColor
+        wrapMode: Text.WordWrap
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         font { family: "Segoe UI"; pixelSize: popupWindow.popupTextSize; bold: true }
         opacity: 1
         anchors { top: image.bottom; topMargin: popupWindow.textOffset; horizontalCenter: parent.horizontalCenter }
