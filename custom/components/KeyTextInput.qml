@@ -16,12 +16,14 @@ FocusScope {
     property string textInputValue: ""
     property bool hasHoverText: true
     property var keyMap: ({
-        [Qt.Key_Insert]: "Insert",
-        [Qt.Key_Delete]: "Delete",
-        [Qt.Key_Home]: "Home",
-        [Qt.Key_End]: "End",
-        [Qt.Key_PageUp]: "Page Up",
-        [Qt.Key_PageDown]: "Page Down",
+        [Qt.Key_Insert]: "INSERT",
+        [Qt.Key_Delete]: "DELETE",
+        [Qt.Key_Home]: "HOME",
+        [Qt.Key_End]: "END",
+        [Qt.Key_CapsLock]: "CAPSLOCK",
+        [Qt.Key_PageUp]: "PAGEUP",
+        [Qt.Key_PageDown]: "PAGEDOWN",
+        [Qt.Key_Pause]: "PAUSE",
         [Qt.Key_F1]: "F1",
         [Qt.Key_F2]: "F2",
         [Qt.Key_F3]: "F3",

@@ -107,11 +107,16 @@ QString VirtualKeyToQString(DWORD vkCode) {
     UINT scanCode = MapVirtualKey(vkCode, MAPVK_VK_TO_VSC);
 
     // Create a buffer to hold the key name
-    char keyName[128];
+    wchar_t keyName[128];
     // Get the key name
-    int length = GetKeyNameTextA(scanCode << 16, keyName, sizeof(keyName));
+    int length = GetKeyNameTextW(scanCode << 16, keyName, sizeof(keyName) / sizeof(wchar_t));
     if (length > 0) {
-        return QString::fromLocal8Bit(keyName, length);
+        QString keyString = QString::fromWCharArray(keyName, length);
+        // Check if the string is lowercase and convert it to uppercase if necessary
+        if (keyString != keyString.toUpper()) {
+            keyString = keyString.toUpper();
+        }
+        return keyString;
     } else {
         return QString("Unknown");
     }
@@ -122,13 +127,13 @@ LRESULT CALLBACK AppController::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
         KBDLLHOOKSTRUCT* pKeyboard = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 
         // If the CTRL is pressed (the high order bit is set), we add it to the key string
-        QString key = GetKeyState(VK_CONTROL) & 0x8000 ? "Ctrl+" : "";
+        QString key = GetKeyState(VK_CONTROL) & 0x8000 ? "CTRL+" : "";
 
         if(GetKeyState(VK_SHIFT) & 0x8000)
-            key += "Shift+";
+            key += "SHIFT+";
 
         if(GetKeyState(VK_MENU) & 0x8000)
-            key += "Alt+";
+            key += "ALT+";
 
         key += VirtualKeyToQString(pKeyboard->vkCode);
 
