@@ -210,6 +210,7 @@ Item {
             SimpleTextInput {
                 id: macroNameInput
                 anchors { top: createMacroText.bottom; left: createMacroText.left; right: createButton.right; topMargin: 8 }
+                errorText: "Field cannot be empty"
                 bgColor: "transparent"
                 fontSize: 14
                 width: 160
@@ -270,30 +271,51 @@ Item {
                 anchors.topMargin: 4
                 iconSize: 26
                 onClicked: {
+                    var combined = "";
+                    var hasEmptyInput = false;
 
-                    var combined = ""
+                    // Iterate over each item in the macroRepeater
                     for (var i = 0; i < macroRepeater.count; i++) {
-                        var item = macroRepeater.itemAt(i)
+                        var item = macroRepeater.itemAt(i);
                         if (item) {
-                            combined += item.inputCode;
+
+                            if (item.useKeyInputValue.length !== 0) {
+                                combined += item.inputCode;
+                            }
+
+                            // Check if the KeyTextInput inside the KeyMacroInputField is empty
+                            else if (item.useKeyInputValue.length === 0) {
+                                item.useKeyErrorAnimation();
+                            }
                         }
                     }
-                    inputCodeCombined = combined.trim()
+
+                    inputCodeCombined = combined.trim();
                     console.log(inputCodeCombined);
 
-
-                    macroItemModel.append({macroName: macroNameInput.textInputValue, macroCode: mainKeyInput.textInputValue + "->" + inputCodeCombined})
-
-                    while (macroModel.count > 1) {
-                        macroModel.remove(1)  // Always remove the second item until only the first remains
+                    if (macroNameInput.textInputValue.length === 0) {
+                        macroNameInput.triggerErrorAnimation();
+                        hasEmptyInput = true;
                     }
-                    var firstItem = macroRepeater.itemAt(0)
-                    if (firstItem) {
-                        firstItem.clearKeyInputText()
+                    if (mainKeyInput.textInputValue.length === 0) {
+                        mainKeyInput.triggerErrorAnimation();
+                        hasEmptyInput = true;
                     }
 
-                    mainKeyInput.clearInputField()
-                    macroNameInput.clearInputField()
+                    if (!hasEmptyInput) {
+                        macroItemModel.append({macroName: macroNameInput.textInputValue, macroCode: mainKeyInput.textInputValue + "->" + inputCodeCombined});
+
+                        while (macroModel.count > 1) {
+                            macroModel.remove(1);  // Always remove the second item until only the first remains
+                        }
+                        var firstItem = macroRepeater.itemAt(0);
+                        if (firstItem) {
+                            firstItem.clearKeyInputText();
+                        }
+
+                        mainKeyInput.clearInputField();
+                        macroNameInput.clearInputField();
+                    }
                 }
             }
         }
@@ -311,6 +333,15 @@ Item {
         radius: 4
 
         signal deleteRequested(int index)
+        property bool isEmpty: macroItemModel.count
+
+        Image {
+            id: image
+            source: macroListContainer.isEmpty ? "../images/happy.svg" : "../images/sad.svg"
+            sourceSize.width: 60
+            sourceSize.height: 55
+            anchors { right: parent.right; top: parent.top; topMargin: 8; rightMargin: 18 }
+        }
 
 
         onDeleteRequested:(index) => {
@@ -326,6 +357,7 @@ Item {
             popupText: "Are you sure?"
             popupTextSize: 32
             popupTextColor: "#f0c3e2"
+            imageURL: "../images/scared.svg"
             borderWidth: 0
             borderRadius: 0
             imageOffset: 42 // from top of the window
@@ -346,6 +378,7 @@ Item {
             popupText: "Edit macro"
             popupTextSize: 32
             popupTextColor: "#f0c3e2"
+            imageURL: "../images/confused.svg"
             borderWidth: 0
             borderRadius: 0
             imageOffset: 22

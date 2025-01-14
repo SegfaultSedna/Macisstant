@@ -10,6 +10,17 @@ Item {
     property string labelColor
     property string borderColor
 
+    // Expose textInputValue from useKeyInput
+    property alias useKeyInputValue: useKeyInput.textInputValue
+
+    // Expose textInputValue from delayInput
+    property alias delayInputValue: delayInput.textInputValue
+
+    // Expose triggerErrorAnimation from useKeyInput
+    function useKeyErrorAnimation() {
+        useKeyInput.triggerErrorAnimation();
+    }
+
     KeyTextInput {
         id: useKeyInput
         width: 80
@@ -23,14 +34,13 @@ Item {
         borderColor: keyMacroInputField.borderColor
     }
 
-
     NumberTextInput {
         id: delayInput
         width: 50
         height: 27
         anchors.top: useKeyInput.top
         anchors.left: useKeyInput.right
-        anchors.leftMargin:4
+        anchors.leftMargin: 4
         bgColor: keyMacroInputField.bgColor
         hasHoverText: keyMacroInputField.hasHoverText
         inputColor: keyMacroInputField.inputColor
@@ -42,5 +52,4 @@ Item {
         useKeyInput.clearInputField()
         delayInput.clearInputField()
     }
-
 }

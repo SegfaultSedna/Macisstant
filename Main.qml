@@ -42,11 +42,12 @@ Window {
     Loader {
         id: kbMacrosWindowLoader
         objectName: "kbMacrosWindowLoader"
+        opacity: 0
         anchors.fill: parent
-        visible: false
-        source: visible ? "custom/components/KbMacrosWindow.qml" : ""
+        visible: true
+        source: ""
         onLoaded: {
-            item.macroWindowFadeIn();
+            //item.macroWindowFadeIn();
             kbMacrosWindowLoaded();
             /* Connect to the homeButtonClicked signal
             item.homeButtonClicked.connect(function() {
@@ -160,8 +161,25 @@ Window {
             anchors.centerIn: parent
             onClicked: {
                 mainWindowFadeOut.start();
+                kbMacrosWindowLoader.source = "custom/components/KbMacrosWindow.qml";
                 kbMacrosWindowLoader.visible = true;
+                macroWindowLoaderFadeIn.start();
             }
         }
+
+        ParallelAnimation {
+            id: macroWindowLoaderFadeIn
+            running: false
+
+            PropertyAnimation {
+                target: kbMacrosWindowLoader
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: 800
+                easing.type: Easing.InOutCirc
+            }
+        }
+
     }
 }

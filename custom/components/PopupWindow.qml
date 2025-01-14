@@ -7,6 +7,7 @@ Item {
     Material.theme: Material.Dark
     property string popupText: "Popup text"
     property string popupTextColor: "#e1ddf4"
+    property alias imageURL: image.source
     property int popupTextSize: 22
     property int borderWidth: 2
     property int borderRadius: 4
@@ -32,7 +33,6 @@ Item {
     Image {
         id: image
         property string iconSource
-        source: "../images/confused.svg" // Use the dynamic image path
         sourceSize.width: 160
         sourceSize.height: 140
         anchors { top: parent.top; topMargin: popupWindow.imageOffset; horizontalCenter: parent.horizontalCenter }

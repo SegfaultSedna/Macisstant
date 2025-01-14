@@ -111,8 +111,8 @@ FocusScope {
             PropertyAnimation {
                 target: errorText
                 property: "anchors.topMargin"
-                from: 0
-                to: 4
+                from: -4
+                to: 0
                 duration: 1000
                 easing.type: Easing.InOutQuad
             }

@@ -10,6 +10,7 @@ FocusScope {
     property alias borderColor: rect.border.color
     property alias inputColor: textInput.color
     property alias labelColor: placeholder.color
+    property string errorText: ""
     property string hoverCustomText: "hover text"
     property string mainText: "add key"
     property string textInputValue: ""
@@ -216,5 +217,84 @@ FocusScope {
                 }
             }
         }
+
+        SequentialAnimation {
+            id: errorAnimation
+            running: false
+            loops: 2
+            ColorAnimation {
+                target: rect
+                property: "color"
+                from: keyTextInput.bgColor
+                to: "#B71C1C"
+                duration: 500
+            }
+
+            ColorAnimation {
+                target: rect
+                property: "color"
+                from: "#B71C1C"
+                to: keyTextInput.bgColor
+                duration: 500
+            }
+        }
+
+        Label {
+            id: errorText
+            text: keyTextInput.errorText
+            color: "#F44336"
+            opacity: 0
+            font { family: "Segoe UI"; pixelSize: 14; bold: true }
+            anchors { horizontalCenter: rect.horizontalCenter; top: rect.bottom }
+        }
+
+        ParallelAnimation {
+            id: errorTextAnimation
+            running: false
+            PropertyAnimation {
+                target: errorText
+                property: "anchors.topMargin"
+                from: -4
+                to: 0
+                duration: 1000
+                easing.type: Easing.InOutQuad
+            }
+            PropertyAnimation {
+                target: errorText
+                property: "opacity"
+                from: 0
+                to: 1
+                duration: 1000
+                easing.type: Easing.InOutQuad
+            }
+        }
+
+
+        // Timer to trigger fade-out animation after 4 seconds
+        Timer {
+            id: fadeOutTimer
+            interval: 4000
+            repeat: false
+            onTriggered: {
+                errorFadeOutAnimation.start();
+            }
+        }
+
+        // Fade-out animation for error text
+        PropertyAnimation {
+            id: errorFadeOutAnimation
+            target: errorText
+            property: "opacity"
+            from: 1
+            to: 0
+            duration: 2000
+            easing.type: Easing.InOutQuad
+        }
+    }
+
+    function triggerErrorAnimation() {
+        errorAnimation.start();
+        errorTextAnimation.start();
+        fadeOutTimer.start();
     }
 }
