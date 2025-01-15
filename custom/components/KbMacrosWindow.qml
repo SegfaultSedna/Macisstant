@@ -373,12 +373,24 @@ Item {
         }
 
 
-        onDeleteRequested:(index) => {
-            if(macroItemModel.get(index).state === Qt.Checked) {
-                macroItemModelCopy.remove(index, 1);
-            }
+        onDeleteRequested: function(index) {
+            console.log("Delete requested for index:", index);
+            var item = macroItemModel.get(index);
 
-            macroItemModel.remove(index, 1);
+            if (item) {
+                // Access the MacroItem component via the Repeater's itemAt method
+                var macroItem = macrosRepeater.itemAt(index);
+
+                if (macroItem) {
+                    console.log("MacroItem found:", macroItem);
+                    if (macroItem.checked) {
+                            macroItemModelCopy.remove(index);
+                    }
+
+                    console.log("Removing MacroItem from macroItemModel");
+                    macroItemModel.remove(index);
+                }
+            }
         }
 
         PopupWindow {
@@ -535,7 +547,6 @@ Item {
                         required property int index
                         required macroName
                         required macroCode
-
                         containerWidth: macroListContainer.width/1.5
                         // macroItemModel.get(index).macroCode
 

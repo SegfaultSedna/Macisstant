@@ -264,7 +264,7 @@ void AppController::executeMacro(std::list<int> actions) {
     DisableHook();
     isMacroExecuting = true;
 
-    // 0x01 = ALT, 0x02 = SHIFT, 0x03 = CTRL
+    // 0x01 = ALT, 0x02 = SHIFT, 0x04 = CTRL
     DWORD modifiers = 0;
     bool keyPressed = false;
 
@@ -272,57 +272,59 @@ void AppController::executeMacro(std::list<int> actions) {
 
     // Initialize the inputs
     inputALT.type = inputSHIFT.type = inputCTRL.type = INPUT_KEYBOARD;
-    inputALT.ki.wVk = VK_MENU; // Virtual key code for Alt
-    inputSHIFT.ki.wVk = VK_SHIFT; // Virtual key code for Shift
-    inputCTRL.ki.wVk = VK_CONTROL; // Virtual key code for Ctrl
+    inputALT.ki.wScan = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC); // Scan code for Alt
+    inputSHIFT.ki.wScan = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC); // Scan code for Shift
+    inputCTRL.ki.wScan = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC); // Scan code for Ctrl
+    inputALT.ki.dwFlags = inputSHIFT.ki.dwFlags = inputCTRL.ki.dwFlags = KEYEVENTF_SCANCODE;
 
     // CTRL+SHIFT+D(20)K(30)A(10)
     for(auto action: actions) {
 
         switch (action) {
-            case VK_MENU:
-                modifiers |= 0x01;
-                SendInput(1, &inputALT, sizeof(INPUT));
-                continue;
-            case VK_SHIFT:
-                SendInput(1, &inputALT, sizeof(INPUT));
-                modifiers |= 0x02;
-                continue;
-            case VK_CONTROL:
-                SendInput(1, &inputALT, sizeof(INPUT));
-                modifiers |= 0x03;
-                continue;
-            default:
-                break;
+        case VK_MENU:
+            modifiers |= 0x01;
+            SendInput(1, &inputALT, sizeof(INPUT));
+            continue;
+        case VK_SHIFT:
+            modifiers |= 0x02;
+            SendInput(1, &inputSHIFT, sizeof(INPUT));
+            continue;
+        case VK_CONTROL:
+            modifiers |= 0x04;
+            SendInput(1, &inputCTRL, sizeof(INPUT));
+            continue;
+        default:
+            break;
         }
 
         if(!keyPressed) {
             // Simulate key press
             INPUT input = {0};
             input.type = INPUT_KEYBOARD;
-            input.ki.wVk = action;
+            input.ki.wScan = MapVirtualKey(action, MAPVK_VK_TO_VSC); // Use scan code
+            input.ki.dwFlags = KEYEVENTF_SCANCODE;
             SendInput(1, &input, sizeof(INPUT));
 
             // Simulate key release
-            input.ki.dwFlags = KEYEVENTF_KEYUP;
+            input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
             SendInput(1, &input, sizeof(INPUT));
         }
 
         if(keyPressed) {
             if(modifiers & 0x01) {
-                inputALT.ki.dwFlags = KEYEVENTF_KEYUP;
+                inputALT.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &inputALT, sizeof(INPUT));
-                inputALT.ki.dwFlags = 0;
+                inputALT.ki.dwFlags = KEYEVENTF_SCANCODE;
             }
             if(modifiers & 0x02) {
-                inputSHIFT.ki.dwFlags = KEYEVENTF_KEYUP;
+                inputSHIFT.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &inputSHIFT, sizeof(INPUT));
-                inputSHIFT.ki.dwFlags = 0;
+                inputSHIFT.ki.dwFlags = KEYEVENTF_SCANCODE;
             }
-            if(modifiers & 0x03) {
-                inputCTRL.ki.dwFlags = KEYEVENTF_KEYUP;
+            if(modifiers & 0x04) {
+                inputCTRL.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &inputCTRL, sizeof(INPUT));
-                inputCTRL.ki.dwFlags = 0;
+                inputCTRL.ki.dwFlags = KEYEVENTF_SCANCODE;
             }
 
             keyPressed = false;

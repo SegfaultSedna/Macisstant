@@ -8,6 +8,7 @@ Rectangle {
     required property string macroCode
     required property string macroName
     property alias state: checkBox.checkState
+    property alias checked: checkBox.checked
     //required property real containerHeight
 
     Material.theme: Material.Dark
@@ -24,6 +25,10 @@ Rectangle {
     anchors.left: parent.left
     anchors.leftMargin: 12
     color: "transparent"
+
+    function isChecked() {
+        return checkBox.checked;
+    }
 
     CheckBox {
         id: checkBox
