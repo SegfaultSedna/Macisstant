@@ -162,7 +162,7 @@ Item {
             clip: true
             contentWidth: keyInputColumn.width
             contentHeight: keyInputColumn.height + 120
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
             ListModel {
                 id: macroModel
@@ -357,7 +357,7 @@ Item {
             source: macroListContainer.isEmpty ? "../images/happy.svg" : "../images/sad.svg"
             sourceSize.width: 60
             sourceSize.height: 55
-            anchors { right: parent.right; top: parent.top; topMargin: 8; rightMargin: 18 }
+            anchors { right: parent.right; top: parent.top; topMargin: 8; rightMargin: 10 }
             z: 20
 
             MouseArea {
@@ -503,7 +503,7 @@ Item {
             clip: true
             contentWidth: macroItemColumn.width
             contentHeight: macroItemColumn.height + 120
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
             Label {
                 id: yourMacrosText

@@ -26,10 +26,6 @@ Rectangle {
     anchors.leftMargin: 12
     color: "transparent"
 
-    function isChecked() {
-        return checkBox.checked;
-    }
-
     CheckBox {
         id: checkBox
         anchors.verticalCenter: parent.verticalCenter
