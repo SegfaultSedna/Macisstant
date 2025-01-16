@@ -161,7 +161,7 @@ Item {
             anchors.fill: parent  // Make the ScrollView fill the window
             clip: true
             contentWidth: keyInputColumn.width
-            contentHeight: keyInputColumn.height + 120
+            contentHeight: keyInputColumn.height + 200
             ScrollBar.vertical.policy: ScrollBar.AsNeeded
 
             ListModel {
@@ -487,6 +487,11 @@ Item {
                     editPopup.visible = false;
                     macroItemModel.get(index).macroCode = code;
                     console.log("regex matched");
+
+                    if(macrosRepeater.itemAt(index).checked) {
+                        macroItemModelCopy.remove(index);
+                        macroItemModelCopy.append({macroName: name, macroCode: code});
+                    }
                 }
                 else {
                     editMacroCodeInput.triggerErrorAnimation();
