@@ -10,7 +10,6 @@ Rectangle {
     property alias state: checkBox.checkState
     property alias checked: checkBox.checked
     //required property real containerHeight
-
     Material.theme: Material.Dark
 
     signal deleteButtonClicked()
@@ -44,13 +43,20 @@ Rectangle {
         }
     }
 
-    Label {
-        id: createMacroText
-        anchors { verticalCenter: parent.verticalCenter; left: checkBox.right }
-        text: macroItem.macroName
-        color: "#e1ddf4"
-        font { family: "Segoe UI"; pixelSize: 14; bold: true }
-        opacity: 1
+    Rectangle {
+        anchors { verticalCenter: parent.verticalCenter; left: checkBox.right; right: editMacroButton.right; rightMargin: 28 }
+        //width: parent.width - 80
+        height: parent.height - 18
+        color: "transparent"
+        clip: true
+        Label {
+            id: createMacroText
+            anchors { verticalCenter: parent.verticalCenter }
+            text: macroItem.macroName
+            color: "#e1ddf4"
+            font { family: "Segoe UI"; pixelSize: 14; bold: true }
+            opacity: 1
+        }
     }
 
     IconButton {

@@ -286,6 +286,8 @@ Item {
                             // Check if the KeyTextInput inside the KeyMacroInputField is empty
                             else if (item.useKeyInputValue.length === 0) {
                                 item.useKeyErrorAnimation();
+                                if (i === 0)
+                                    hasEmptyInput = true;
                             }
                         }
                     }

@@ -15,7 +15,7 @@ FocusScope {
     property int borderRadius: 4
     property int borderWidth: 2
     property bool hasHoverText: true
-    property int maximumLength: 12
+    property int maximumLength: 24
     property string textInputValue: ""
 
     function clearInputField() {
@@ -33,25 +33,39 @@ FocusScope {
         opacity: textInput.activeFocus ? 0.95 : (textInput.text.length === 0) ? 0.65 : 0.95
         color: simpleTextInput.bgColor
         z: -1
+        //clip: true
 
-        TextInput {
-            id: textInput
-            color: simpleTextInput.fontColor
-            text: simpleTextInput.textInputValue
+        Rectangle {
+            anchors { horizontalCenter: parent.horizontalCenter }
+            width: parent.width - 24
+            height: parent.height
+            color: "transparent"
+            clip: true
             z: 1
-            font.family: "Segoe UI"
-            font.pixelSize: simpleTextInput.fontSize
-            font.bold: true
-            anchors {verticalCenter: parent.verticalCenter; left: parent.left; leftMargin: 12}
-            selectByMouse: true
-            activeFocusOnTab: true
-            maximumLength: simpleTextInput.maximumLength
+            TextInput {
+                id: textInput
+                color: simpleTextInput.fontColor
+                text: simpleTextInput.textInputValue
+                selectionColor: "#514283"
+                selectByMouse: true
+                activeFocusOnTab: true
+                maximumLength: simpleTextInput.maximumLength
+                autoScroll: true
+                width: parent.width
+                //height: parent.height - 18
+                z: 2
+                font { family: "Segoe UI"; pixelSize: simpleTextInput.fontSize; bold: true }
+                anchors { verticalCenter: parent.verticalCenter; left: parent.left; right: parent.right; rightMargin: 1 }
 
-            onTextEdited: {
-                if(simpleTextInput.onlyUpperCaseText) {
-                    simpleTextInput.textInputValue = textInput.text.toUpperCase();
-                } else {
-                    simpleTextInput.textInputValue = textInput.text;
+
+
+
+                onTextEdited: {
+                    if(simpleTextInput.onlyUpperCaseText) {
+                        simpleTextInput.textInputValue = textInput.text.toUpperCase();
+                    } else {
+                        simpleTextInput.textInputValue = textInput.text;
+                    }
                 }
             }
         }
