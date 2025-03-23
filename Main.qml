@@ -12,7 +12,7 @@ Window {
     width: 900
     height: 600
     visible: true
-    title: qsTr("Macisstant v1.0")
+    title: qsTr("Macisstant v1.1")
     Material.theme: Material.Dark
 
 

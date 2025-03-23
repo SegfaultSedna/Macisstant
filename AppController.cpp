@@ -148,12 +148,17 @@ LRESULT CALLBACK AppController::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
             auto range = parsedActionMap.equal_range(key);
             if (range.first != range.second) {
                 qDebug() << "Global Macros found for key:" << key;
+                // Collect all macros for this key
+                std::vector<std::list<int>> macros;
                 for (auto it = range.first; it != range.second; ++it) {
-                    // Spawn a thread for each macro
-                    std::thread([this_macro = it->second]() {
-                        instance->executeMacro(this_macro);
-                    }).detach();
+                    macros.push_back(it->second);
                 }
+                // Spawn a single thread to execute all macros sequentially
+                std::thread([macros]() {
+                    for (const auto& macro : macros) {
+                        instance->executeMacro(macro);
+                    }
+                }).detach();
                 return 1; // Block the key immediately
             }
         }
