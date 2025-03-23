@@ -13,7 +13,7 @@
 #include <windows.h>
 
 std::unordered_map<QString, QString> AppController::macroList;
-std::unordered_map<QString, std::list<int>> parsedActionMap;
+std::unordered_multimap<QString, std::list<int>> parsedActionMap;
 HHOOK AppController::keyboardHook = nullptr;
 AppController* AppController::instance = nullptr;
 HWND AppController::appWindowHandle = nullptr;
@@ -126,35 +126,35 @@ LRESULT CALLBACK AppController::LowLevelKeyboardProc(int nCode, WPARAM wParam, L
     if (nCode == HC_ACTION) {
         KBDLLHOOKSTRUCT* pKeyboard = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 
-        // If the CTRL is pressed (the high order bit is set), we add it to the key string
+        // Pass through injected events (from SendInput)
+        if (pKeyboard->flags & LLKHF_INJECTED) {
+            return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
+        }
+
         QString key = GetKeyState(VK_CONTROL) & 0x8000 ? "CTRL+" : "";
-
-        if(GetKeyState(VK_SHIFT) & 0x8000)
+        if (GetKeyState(VK_SHIFT) & 0x8000)
             key += "SHIFT+";
-
-        if(GetKeyState(VK_MENU) & 0x8000)
+        if (GetKeyState(VK_MENU) & 0x8000)
             key += "ALT+";
-
         key += VirtualKeyToQString(pKeyboard->vkCode);
 
-        // Check if the foreground window is the application's window
         HWND foregroundWindow = GetForegroundWindow();
-        if (foregroundWindow == appWindowHandle || isMacroExecuting) {
-            //qDebug() << "Ignoring key event in application window or during macro execution";
-            return CallNextHookEx(keyboardHook, nCode, wParam, lParam); // Ignore key events
+        if (foregroundWindow == appWindowHandle) {
+            return CallNextHookEx(keyboardHook, nCode, wParam, lParam);
         }
 
         if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
             qDebug() << "Key Pressed Globally:" << key;
-            if (parsedActionMap.find(key) != parsedActionMap.end()) {
-                qDebug() << "Global Macro found for key:" << key << "with macro code:" << macroList[key];
-                // Ensure the application is not in focus before executing the macro
-                if (foregroundWindow != appWindowHandle) {
-                    //qDebug() << "Executing macro for key:" << key;
-                    //QString macroCode = macroList[key];
-                    instance->executeMacro(parsedActionMap.find(key)->second);
+            auto range = parsedActionMap.equal_range(key);
+            if (range.first != range.second) {
+                qDebug() << "Global Macros found for key:" << key;
+                for (auto it = range.first; it != range.second; ++it) {
+                    // Spawn a thread for each macro
+                    std::thread([this_macro = it->second]() {
+                        instance->executeMacro(this_macro);
+                    }).detach();
                 }
-                return 1; // Block the key event
+                return 1; // Block the key immediately
             }
         }
     }
@@ -251,7 +251,7 @@ void AppController::printListModelElements(QAbstractListModel *listModel) {
 
         qDebug() << "Macro Name:" << macroName.toString()
                  << ", Macro Code:" << macroCode.toString()
-                 << ", Trigger Key:" << triggerKey;
+                 << ", Trigger Key:" << triggerKey << "\n";
     }
 }
 
@@ -260,26 +260,20 @@ void AppController::printListModelElements(QAbstractListModel *listModel) {
 // Have 2 fix:
 // - if the user puts macro for e.g. on CTRL+S it doesn't do the right things because the CTRL is pressed (from the user side)
 void AppController::executeMacro(std::list<int> actions) {
-    // Disable the hook to prevent recursive triggering
-    DisableHook();
-    isMacroExecuting = true;
+    // Remove DisableHook() and EnableHook() calls
+    // Optionally suppress user modifiers (see Step 3)
 
-    // 0x01 = ALT, 0x02 = SHIFT, 0x04 = CTRL
     DWORD modifiers = 0;
     bool keyPressed = false;
 
     INPUT inputALT = {0}, inputSHIFT = {0}, inputCTRL = {0};
-
-    // Initialize the inputs
     inputALT.type = inputSHIFT.type = inputCTRL.type = INPUT_KEYBOARD;
-    inputALT.ki.wScan = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC); // Scan code for Alt
-    inputSHIFT.ki.wScan = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC); // Scan code for Shift
-    inputCTRL.ki.wScan = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC); // Scan code for Ctrl
+    inputALT.ki.wScan = MapVirtualKey(VK_MENU, MAPVK_VK_TO_VSC);
+    inputSHIFT.ki.wScan = MapVirtualKey(VK_SHIFT, MAPVK_VK_TO_VSC);
+    inputCTRL.ki.wScan = MapVirtualKey(VK_CONTROL, MAPVK_VK_TO_VSC);
     inputALT.ki.dwFlags = inputSHIFT.ki.dwFlags = inputCTRL.ki.dwFlags = KEYEVENTF_SCANCODE;
 
-    // CTRL+SHIFT+D(20)K(30)A(10)
-    for(auto action: actions) {
-
+    for (auto action : actions) {
         switch (action) {
         case VK_MENU:
             modifiers |= 0x01;
@@ -297,31 +291,29 @@ void AppController::executeMacro(std::list<int> actions) {
             break;
         }
 
-        if(!keyPressed) {
-            // Simulate key press
+        if (!keyPressed) {
             INPUT input = {0};
             input.type = INPUT_KEYBOARD;
-            input.ki.wScan = MapVirtualKey(action, MAPVK_VK_TO_VSC); // Use scan code
+            input.ki.wScan = MapVirtualKey(action, MAPVK_VK_TO_VSC);
             input.ki.dwFlags = KEYEVENTF_SCANCODE;
             SendInput(1, &input, sizeof(INPUT));
 
-            // Simulate key release
             input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
             SendInput(1, &input, sizeof(INPUT));
         }
 
-        if(keyPressed) {
-            if(modifiers & 0x01) {
+        if (keyPressed) {
+            if (modifiers & 0x01) {
                 inputALT.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &inputALT, sizeof(INPUT));
                 inputALT.ki.dwFlags = KEYEVENTF_SCANCODE;
             }
-            if(modifiers & 0x02) {
+            if (modifiers & 0x02) {
                 inputSHIFT.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &inputSHIFT, sizeof(INPUT));
                 inputSHIFT.ki.dwFlags = KEYEVENTF_SCANCODE;
             }
-            if(modifiers & 0x04) {
+            if (modifiers & 0x04) {
                 inputCTRL.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
                 SendInput(1, &inputCTRL, sizeof(INPUT));
                 inputCTRL.ki.dwFlags = KEYEVENTF_SCANCODE;
@@ -329,20 +321,16 @@ void AppController::executeMacro(std::list<int> actions) {
 
             keyPressed = false;
             modifiers = 0;
-            if(action > 0)
+            if (action > 0)
                 std::this_thread::sleep_for(std::chrono::milliseconds(action));
             continue;
         }
 
         keyPressed = true;
     }
-
-    // Re-enable the hook after execution
-    isMacroExecuting = false;
-    EnableHook();
 }
 
-std::list<int> seperateAndConvertActions(QString& QSTR_actions) {
+std::list<int> separateAndConvertActions(QString& QSTR_actions) {
     std::list<int> result;
     bool parsingDelay = false;
     bool modifier = false;
@@ -355,7 +343,11 @@ std::list<int> seperateAndConvertActions(QString& QSTR_actions) {
 
     for (int x = 0; x < actions.length(); x++) {
         if (actions[x] == ')') {
-            result.push_back(std::stoi(delaystr));
+            if(actions[x-1] == '(') {
+                result.push_back(0);
+            } else {
+                result.push_back(std::stoi(delaystr));
+            }
             delaystr = "";
             parsingDelay = false;
             continue;
@@ -392,6 +384,7 @@ std::list<int> seperateAndConvertActions(QString& QSTR_actions) {
 }
 
 void AppController::updateMacros(QAbstractListModel *listModel) {
+    parsedActionMap.reserve(32);
     parsedActionMap.clear();  // Clear existing mappings
 
     for (int i = 0; i < listModel->rowCount(); ++i) {
@@ -399,7 +392,7 @@ void AppController::updateMacros(QAbstractListModel *listModel) {
         QVariant macroCode = listModel->data(index, listModel->roleNames().key("macroCode"));
 
         std::pair<QString, QString> macro = seperateTriggerAndActions(macroCode.toString());
-        parsedActionMap[macro.first] = seperateAndConvertActions(macro.second);
+        parsedActionMap.insert(std::make_pair(macro.first, separateAndConvertActions(macro.second)));
         /* macro.first -> triggerkey, macro.second -> the actions
         if (!macro.first.isEmpty() && !macro.second.isEmpty()) {
             qDebug() << "Storing macro for key:" << macro.first << "with actions:" << macro.second;

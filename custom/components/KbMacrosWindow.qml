@@ -574,9 +574,15 @@ Item {
                                 macroItemModelCopy.append({macroName: macroName, macroCode: macroCode});
                                 console.log(macroItemModelCopy);
                             }
-                            if(state === Qt.Unchecked) {
-                                macroItemModelCopy.remove(index, 1);
-                                console.log(macroItemModelCopy);
+                            if (state === Qt.Unchecked) {
+                                    // Find and remove the item with matching macroName
+                                    for (var i = 0; i < macroItemModelCopy.count; i++) {
+                                        if (macroItemModelCopy.get(i).macroName === macroName) {
+                                            macroItemModelCopy.remove(i, 1);
+                                            break; // Exit after removing the first match
+                                        }
+                                    }
+                                    console.log(macroItemModelCopy);
                             }
                         }
                     }

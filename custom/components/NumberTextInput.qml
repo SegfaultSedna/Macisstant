@@ -90,9 +90,8 @@ FocusScope {
             font { family: "Segoe UI"; pixelSize: 12; bold: true }
             anchors.centerIn: parent
             activeFocusOnTab: true
-            onTextChanged: {
-                numberTextInput.textInputValue = textInput.text;
-            }
+
+
         }
 
         Label {
